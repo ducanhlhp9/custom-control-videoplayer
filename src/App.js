@@ -14,6 +14,7 @@ import Paper from "@material-ui/core/Paper"
 const useStyles = makeStyles({
     playerWrapper: {
         width: "100%",
+        height: "100%",
         position: "relative",
     },
 });
@@ -31,24 +32,13 @@ const format = (seconds) => {
     return `${mm}:${ss}`;
 }
 
-
+let count;
+count = 0;
 function App() {
     const classes = useStyles();
-    // const [anchorEl, , setAnchorEl] = React.useState(null);
-    //
-    // const handlePopover = (event) => {
-    //     setAnchorEl(event.currentTarget);
-    // };
-    //
-    // const handleClose = () => {
-    //     setAnchorEl(null);
-    // };
-    //
-    // const open = Boolean(anchorEl);
-    // const id = open ? 'playbackrate-popover' : undefined;
     const [state, setState] = useState({
         playing: true,
-        muted: true,
+        muted: false,
         volume: 0.5,
         playbackRate: 1.0,
         played: 0,
@@ -83,6 +73,7 @@ function App() {
     const playerRef = useRef(null);
     const playerContainerRef = useRef(null);
     const canvasRef = useRef(null);
+    const controlsRef = useRef(null);
 
     const handleRewind = () => {
         playerRef.current.seekTo(playerRef.current.getCurrentTime() - 10)
@@ -118,6 +109,13 @@ function App() {
         screenFull.toggle(playerContainerRef.current)
     }
     const handleProgress = (changeState) => {
+        if(count > 3){
+            controlsRef.current.style.visibility ="hidden"
+            count = 0
+        }
+        if(controlsRef.current.style.visibility =='visible'){
+            count++
+        }
         if (!state.seeking) {
             setState({...state, ...changeState});
 
@@ -145,21 +143,22 @@ function App() {
             timeDisplayFormat === 'normal' ? 'remaining' : 'normal'
         );
     };
+
+    const handleMouseMove=()=>{
+        controlsRef.current.style.visibility ="visible";
+        count = 0 ;
+    }
     return (
         <>
-            <AppBar pposition={"fixed"}>
-                <Toolbar>
-                    <Typography>React video Player</Typography>
-                </Toolbar>
-            </AppBar>
+
             <Toolbar/>
             <Container maxWidth="md">
-                <div ref={playerContainerRef} className={classes.playerWrapper}>
+                <div ref={playerContainerRef} className={classes.playerWrapper} onMouseMove={handleMouseMove}>
                     <ReactPlayer
                         ref={playerRef}
                         width={"100%"}
                         height={"100%"}
-                        url="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+                        url="https://www.cdc.gov/wcms/video/low-res/coronavirus/2020/296296wear-mask-60-asl.mp4"
                         muted={muted}
                         playing={playing}
                         volume={volume}
@@ -174,6 +173,7 @@ function App() {
                         }}
                     />
                     <PlayerControls
+                        ref={controlsRef}
                         onPlayPause={handlePlayPause} playing={playing}
                         playing={playing}
                         onRewind={handleRewind}
@@ -193,7 +193,7 @@ function App() {
                         elapsedTime={elapsedTime}
                         totalDuration={totalDuration}
                         onChangeDisplayFormat={handleChangeDisplayFormat}
-                        onBookMark={addBookmark}
+                        onBookmark={addBookmark}
                     />
                 </div>
                 <Grid container style={{marginTop: 20}} spacing={3}>

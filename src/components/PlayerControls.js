@@ -1,4 +1,4 @@
-import React from "react"
+import React, {forwardRef} from "react"
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
@@ -94,28 +94,28 @@ const PrettoSlider = withStyles({
         borderRadius: 4,
     },
 })(Slider);
-export default ({
-                    onPlayPause,
-                    playing,
-                    onRewind,
-                    onFastForward,
-                    muted,
-                    onMute,
-                    onVolumeChange,
-                    onVolumeSeekUp,
-                    volume,
-                    onPlaybackRateChange,
-                    playbackRate,
-                    onToggleFullScreen,
-                    played,
-                    onSeek,
-                    onSeekMouseDown,
-                    onSeekMouseUp,
-                    elapsedTime,
-                    totalDuration,
-                    onChangeDisplayFormat,
-                    onBookmark
-                }) => {
+export default forwardRef(({
+                               onPlayPause,
+                               playing,
+                               onRewind,
+                               onFastForward,
+                               muted,
+                               onMute,
+                               onVolumeChange,
+                               onVolumeSeekUp,
+                               volume,
+                               onPlaybackRateChange,
+                               playbackRate,
+                               onToggleFullScreen,
+                               played,
+                               onSeek,
+                               onSeekMouseDown,
+                               onSeekMouseUp,
+                               elapsedTime,
+                               totalDuration,
+                               onChangeDisplayFormat,
+                               onBookmark
+                           }, ref) => {
     const classes = useStyles();
     const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -129,11 +129,11 @@ export default ({
     const open = Boolean(anchorEl);
     const id = open ? 'playbackrate-popover' : undefined;
     return (
-        <div className={classes.controlsWrapper}>
+        <div className={classes.controlsWrapper} ref ={ref}>
             <Grid container direction="row" alignItems={"center"} justify={"space-between"}
                   style={{padding: 16}}>
                 <Grid item>
-                    <Typography variant={"h5"} style={{color: "#fff"}}>Video title</Typography>
+                    <Typography variant={"h5"} style={{color: "#fff"}}>I wear a mask because</Typography>
                 </Grid>
 
                 <Grid item>
@@ -233,4 +233,4 @@ export default ({
         </div>
     )
 
-}
+})
