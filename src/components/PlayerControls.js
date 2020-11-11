@@ -11,6 +11,8 @@ import VolumeUpIcon from "@material-ui/icons/VolumeUp";
 import Slider from "@material-ui/core/Slider";
 import Popover from "@material-ui/core/Popover";
 import FullscreenIcon from "@material-ui/icons/Fullscreen";
+import PauseIcon from "@material-ui/icons/Pause";
+import VolumeOffIcon from "@material-ui/icons/VolumeOff";
 import {makeStyles, withStyles} from "@material-ui/core/styles";
 import Tooltip from "@material-ui/core/Tooltip";
 
@@ -92,7 +94,28 @@ const PrettoSlider = withStyles({
         borderRadius: 4,
     },
 })(Slider);
-export default ()=>{
+export default ({
+                    onPlayPause,
+                    playing,
+                    onRewind,
+                    onFastForward,
+                    muted,
+                    onMute,
+                    onVolumeChange,
+                    onVolumeSeekUp,
+                    volume,
+                    onPlaybackRateChange,
+                    playbackRate,
+                    onToggleFullScreen,
+                    played,
+                    onSeek,
+                    onSeekMouseDown,
+                    onSeekMouseUp,
+                    elapsedTime,
+                    totalDuration,
+                    onChangeDisplayFormat,
+                    onBookmark
+                }) => {
     const classes = useStyles();
     const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -114,7 +137,7 @@ export default ()=>{
                 </Grid>
 
                 <Grid item>
-                    <Button variant="contained"
+                    <Button onClick={onBookmark} variant="contained"
                             color="primary"
                             startIcon={<BookmarkIcon/>}
                     >
@@ -124,13 +147,13 @@ export default ()=>{
             </Grid>
             {/*middle controls*/}
             <Grid container direction="row" alignItems="center" justify={"center"}>
-                <IconButton className={classes.controlIcons} aria-label={"reqind"}>
+                <IconButton onClick={onRewind} className={classes.controlIcons} aria-label={"reqind"}>
                     <FastRewindIcon fontSize={"inherit"}/>
                 </IconButton>
-                <IconButton className={classes.controlIcons} aria-label={"reqind"}>
-                    <PlayArrowIcon fontSize={"inherit"}/>
+                <IconButton onClick={onPlayPause} className={classes.controlIcons} aria-label={"reqind"}>
+                    {playing ? (<PauseIcon fontSize={"inherit"}/>) : (<PlayArrowIcon fontSize={"inherit"}/>)}
                 </IconButton>
-                <IconButton className={classes.controlIcons} aria-label={"reqind"}>
+                <IconButton onClick={onFastForward} className={classes.controlIcons} aria-label={"reqind"}>
                     <FastForwardIcon fontSize={"inherit"}/>
                 </IconButton>
             </Grid>
@@ -141,34 +164,44 @@ export default ()=>{
                 alignItems={"center"}
                 style={{padding: 16}}>
                 <Grid item xs={12}>
-                    <PrettoSlider min={0} max={100} defaultValue={20}
-                                  ValueLabelComponent={ValueLabelComponent}/>
+                    <PrettoSlider min={0} max={100} value={played * 100}
+                                  ValueLabelComponent={(props) => <ValueLabelComponent {...props} value={elapsedTime}/>}
+                                  onChange={onSeek}
+                                  onMouseDown={onSeekMouseDown}
+                                  onChangeCommitted={onSeekMouseUp}/>
                 </Grid>
                 <Grid item>
                     <Grid container alignItems={"center"} direction={"row"}>
-                        <IconButton className={classes.bottomIcons}>
-                            <PlayArrowIcon fontSize={"large"}/>
+                        <IconButton onClick={onPlayPause} className={classes.bottomIcons}>
+                            {playing ? (
+                                <PauseIcon fontSize="large"/>
+                            ) : (
+                                <PlayArrowIcon fontSize={"large"}/>
+                            )}
+
                         </IconButton>
-                        <IconButton className={classes.bottomIcons}>
-                            <VolumeUpIcon fontSize={"large"}/>
+                        <IconButton onClick={onMute} className={classes.bottomIcons}>
+                            {muted ? <VolumeOffIcon fontSize={"large"}/> : <VolumeUpIcon fontSize={"large"}/>}
                         </IconButton>
 
                         <Slider
                             min={0}
                             max={100}
-                            defaultValue={100} className={classes.volumeSlider}/>
+                            volume={volume * 100} className={classes.volumeSlider}
+                            onChange={onVolumeChange}
+                            onChangeCommitted={onVolumeSeekUp}/>
 
-                        <Button
-                            variant={"text"}
-                            style={{color: "#fff", marginLeft: 16}}>
-                            <Typography>05:05</Typography>
+                        <Button onClick={onChangeDisplayFormat}
+                                variant={"text"}
+                                style={{color: "#fff", marginLeft: 16}}>
+                            <Typography>{elapsedTime}/{totalDuration}</Typography>
                         </Button>
                     </Grid>
 
                 </Grid>
                 <Grid item>
                     <Button onClick={handlePopover} variant={"text"} className={classes.bottomIcons}>
-                        <Typography>1X</Typography>
+                        <Typography>{playbackRate}X</Typography>
                     </Button>
                     <Popover
                         id={id}
@@ -185,13 +218,15 @@ export default ()=>{
                         }}
                     >
                         <Grid container direction={"column reverse"}>
-                            {[0.5, 1, 1.5, 2].map(rate => (<Button variant={"text"}>
-                                <Typography color={"secondary"}>{rate}</Typography>
-                            </Button>))}
+                            {[0.5, 1, 1.5, 2].map(rate => (
+                                <Button variant={"text"} onClick={() => onPlaybackRateChange(rate)}>
+                                    <Typography
+                                        color={rate === playbackRate ? "secondary" : "default"}>{rate}</Typography>
+                                </Button>))}
                         </Grid>
                     </Popover>
                     <IconButton className={classes.bottomIcons}>
-                        <FullscreenIcon fontSize={"large"}/>
+                        <FullscreenIcon onClick={onToggleFullScreen} fontSize={"large"}/>
                     </IconButton>
                 </Grid>
             </Grid>
